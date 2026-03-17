@@ -1,0 +1,27 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+	<PropertyGroup>
+		<TargetFramework>net10.0</TargetFramework>
+		<OutputType>Exe</OutputType>
+		<ImplicitUsings>enable</ImplicitUsings>
+		<Nullable>enable</Nullable>
+		<LangVersion>preview</LangVersion>
+		<TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+		<GenerateDocumentationFile>false</GenerateDocumentationFile>
+		<UserSecretsId>KoFi.Client.Sample</UserSecretsId>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<ProjectReference Include="..\..\src\KoFi.Client.DependencyInjection\KoFi.Client.DependencyInjection.csproj" />
+		<ProjectReference Include="..\..\src\KoFi.Client\KoFi.Client.csproj" />
+		<ProjectReference Include="..\..\src\KoFi.Client.AspNetCore\KoFi.Client.AspNetCore.csproj" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<PackageReference Include="DevTunnels.Client" Version="0.1.0" />
+		<PackageReference Include="Spectre.Console" Version="0.54.0" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<FrameworkReference Include="Microsoft.AspNetCore.App" />
+	</ItemGroup>
+</Project>
