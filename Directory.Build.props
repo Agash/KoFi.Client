@@ -17,8 +17,6 @@
     <RepositoryUrl>https://github.com/Agash/KoFi.Client</RepositoryUrl>
     <PackageProjectUrl>https://github.com/Agash/KoFi.Client</PackageProjectUrl>
     <GenerateDocumentationFile Condition="'$(IsPackable)' == 'true'">true</GenerateDocumentationFile>
-    <IncludeSymbols Condition="'$(IsPackable)' == 'true'">true</IncludeSymbols>
-    <SymbolPackageFormat Condition="'$(IsPackable)' == 'true'">snupkg</SymbolPackageFormat>
     <PackageReadmeFile>README.md</PackageReadmeFile>
   </PropertyGroup>
 
