@@ -7,6 +7,9 @@
     <PackageId>KoFi.Client.DependencyInjection</PackageId>
     <Title>KoFi.Client.DependencyInjection</Title>
     <Description>Dependency injection helpers for KoFi.Client.</Description>
+    <MinVerTagPrefix>v</MinVerTagPrefix>
+    <PublishRepositoryUrl>true</PublishRepositoryUrl>
+    <EmbedUntrackedSources>true</EmbedUntrackedSources>
   </PropertyGroup>
 
   <ItemGroup>
@@ -16,5 +19,10 @@
   <ItemGroup>
     <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="10.0.5" />
     <PackageReference Include="Microsoft.Extensions.Options" Version="10.0.5" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="MinVer" Version="7.0.0" PrivateAssets="all" />
+    <PackageReference Include="DotNet.ReproducibleBuilds" Version="2.0.2" PrivateAssets="all" />
   </ItemGroup>
 </Project>
