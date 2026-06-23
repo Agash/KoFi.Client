@@ -8,6 +8,8 @@
 		<TreatWarningsAsErrors>true</TreatWarningsAsErrors>
 		<IsPackable>false</IsPackable>
 		<GenerateDocumentationFile>false</GenerateDocumentationFile>
+		<EnforceCodeStyleInBuild>false</EnforceCodeStyleInBuild>
+		<NoWarn>$(NoWarn);CA1305</NoWarn>
 		<UserSecretsId>KoFi.Client.Sample</UserSecretsId>
 	</PropertyGroup>
 
