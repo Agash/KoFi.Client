@@ -1,4 +1,8 @@
 using DevTunnels.Client;
+using DevTunnels.Client.Authentication;
+using DevTunnels.Client.Hosting;
+using DevTunnels.Client.Ports;
+using DevTunnels.Client.Tunnels;
 using KoFi.Client.AspNetCore;
 using KoFi.Client.DependencyInjection;
 using KoFi.Client.Events;

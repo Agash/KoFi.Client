@@ -24,7 +24,7 @@
 
 	<ItemGroup>
 		<ProjectReference Include="..\KoFi.Client\KoFi.Client.csproj" />
-		<PackageReference Include="Agash.Webhook.Abstractions" Version="1.0.1" />
+		<PackageReference Include="Agash.Webhook.Abstractions" Version="1.0.2" />
 	</ItemGroup>
 
 	<ItemGroup>
