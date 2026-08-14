@@ -6,7 +6,17 @@
     <Nullable>enable</Nullable>
     <IsPackable>false</IsPackable>
     <IsTestProject>true</IsTestProject>
-    <EnableMicrosoftTestingPlatformRunner>true</EnableMicrosoftTestingPlatformRunner>
+    <OutputType>Exe</OutputType>
+    <EnableMSTestRunner>true</EnableMSTestRunner>
+
+    <GenerateDocumentationFile>false</GenerateDocumentationFile>
+
+    <!-- Test naming and disposal idioms differ from library code; opt out as the other repos do. -->
+
+    <NoWarn>197609NoWarn);IDE0005;IDE1006;IDE0058;CA1707</NoWarn>
+
+
+
   </PropertyGroup>
 
   <ItemGroup>
