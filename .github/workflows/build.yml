@@ -24,6 +24,12 @@ jobs:
   build_and_test:
     name: Build, Test, and Pack
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      # Signing the provenance statement for the packages this job produces. Stated explicitly
+      # because attestation needs more than the read-only default.
+      id-token: write
+      attestations: write
 
     steps:
     - name: Checkout code
@@ -100,6 +106,15 @@ jobs:
     - name: Pack packages
       if: (github.event_name == 'push' && github.ref == 'refs/heads/main') || github.event_name == 'release'
       run: dotnet pack KoFi.Client.slnx --configuration Release --no-build --output ${{ env.NuGetDirectory }}
+
+    - name: Attest build provenance
+      # Records, in a signed statement GitHub hosts, which workflow and which commit produced these
+      # exact package files. Anyone who downloads the package can verify it came from this repository
+      # rather than from someone who republished it under the same name.
+      if: (github.event_name == 'push' && github.ref == 'refs/heads/main') || github.event_name == 'release'
+      uses: actions/attest-build-provenance@v3
+      with:
+        subject-path: ${{ env.NuGetDirectory }}/*.nupkg
 
     - name: Upload package artifact
       if: (github.event_name == 'push' && github.ref == 'refs/heads/main') || github.event_name == 'release'
