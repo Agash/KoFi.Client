@@ -129,7 +129,7 @@ public sealed class KoFiWebhookHandlerTests
         Assert.IsTrue(result.IsAuthenticated);
         Assert.IsTrue(result.IsKnownEvent);
 
-        Assert.IsInstanceOfType<KoFiDonationEvent>(result.Event);
+        _ = Assert.IsInstanceOfType<KoFiDonationEvent>(result.Event);
         var donation = (KoFiDonationEvent)result.Event;
         Assert.AreEqual(5.00m, donation.Amount);
         Assert.AreEqual("USD", donation.Currency);
@@ -144,7 +144,7 @@ public sealed class KoFiWebhookHandlerTests
             Request(PayloadJson("Subscription", isSubscriptionPayment: true, isFirstSubscriptionPayment: true)),
             Options);
 
-        Assert.IsInstanceOfType<KoFiSubscriptionStartedEvent>(result.Event);
+        _ = Assert.IsInstanceOfType<KoFiSubscriptionStartedEvent>(result.Event);
     }
 
     [TestMethod]
@@ -154,7 +154,7 @@ public sealed class KoFiWebhookHandlerTests
             Request(PayloadJson("Subscription", isSubscriptionPayment: true)),
             Options);
 
-        Assert.IsInstanceOfType<KoFiSubscriptionRenewedEvent>(result.Event);
+        _ = Assert.IsInstanceOfType<KoFiSubscriptionRenewedEvent>(result.Event);
     }
 
     [TestMethod]
@@ -179,7 +179,7 @@ public sealed class KoFiWebhookHandlerTests
         Assert.AreEqual(200, result.Response.StatusCode);
         Assert.IsTrue(result.IsAuthenticated);
         Assert.IsFalse(result.IsKnownEvent);
-        Assert.IsInstanceOfType<KoFiUnknownWebhookEvent>(result.Event);
+        _ = Assert.IsInstanceOfType<KoFiUnknownWebhookEvent>(result.Event);
     }
 
     [TestMethod]
@@ -188,7 +188,7 @@ public sealed class KoFiWebhookHandlerTests
         using CancellationTokenSource cts = new();
         await cts.CancelAsync();
 
-        await Assert.ThrowsExactlyAsync<OperationCanceledException>(
+        _ = await Assert.ThrowsExactlyAsync<OperationCanceledException>(
             () => _handler.HandleAsync(Request(), Options, cts.Token));
     }
 
