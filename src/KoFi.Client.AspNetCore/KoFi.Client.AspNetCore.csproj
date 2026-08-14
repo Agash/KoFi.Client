@@ -10,7 +10,6 @@
 		<IsPackable>true</IsPackable>
 		<PackageId>KoFi.Client.AspNetCore</PackageId>
 		<MinVerTagPrefix>v</MinVerTagPrefix>
-		<PublishRepositoryUrl>true</PublishRepositoryUrl>
 		<EmbedUntrackedSources>true</EmbedUntrackedSources>
 		<Title>KoFi.Client.AspNetCore</Title>
 		<Authors>Agash</Authors>
