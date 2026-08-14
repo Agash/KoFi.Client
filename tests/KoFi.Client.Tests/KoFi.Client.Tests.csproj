@@ -13,7 +13,7 @@
 
     <!-- Test naming and disposal idioms differ from library code; opt out as the other repos do. -->
 
-    <NoWarn>197609NoWarn);IDE0005;IDE1006;IDE0058;CA1707</NoWarn>
+    <NoWarn>$(NoWarn);IDE0005;IDE1006;IDE0058;CA1707</NoWarn>
 
 
 
