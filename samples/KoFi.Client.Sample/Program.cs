@@ -1,3 +1,4 @@
+using System.Collections.Concurrent;
 using DevTunnels.Client;
 using DevTunnels.Client.Authentication;
 using DevTunnels.Client.Hosting;
@@ -10,7 +11,6 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Spectre.Console;
-using System.Collections.Concurrent;
 
 CancellationTokenSource shutdown = new();
 
@@ -45,11 +45,11 @@ internal static class SampleApplication
     {
         AnsiConsole.Clear();
 
-        AnsiConsole.Write(
-            new FigletText("KoFi Sample")
-                .Color(Color.HotPink));
+        AnsiConsole.Write(new FigletText("KoFi Sample").Color(Color.HotPink));
 
-        AnsiConsole.MarkupLine("[grey]Transport-neutral Ko-fi webhook sample with ASP.NET Core, Spectre.Console, and DevTunnels.Client.[/]");
+        AnsiConsole.MarkupLine(
+            "[grey]Transport-neutral Ko-fi webhook sample with ASP.NET Core, Spectre.Console, and DevTunnels.Client.[/]"
+        );
         AnsiConsole.WriteLine();
 
         SampleConfiguration configuration = PromptConfiguration();
@@ -66,10 +66,13 @@ internal static class SampleApplication
 
         _ = app.MapGet(
             "/",
-            () => Results.Text(
-                "KoFi.Client.Sample is running.\n" +
-                "POST Ko-fi webhook payloads to the configured route.\n",
-                "text/plain"));
+            () =>
+                Results.Text(
+                    "KoFi.Client.Sample is running.\n"
+                        + "POST Ko-fi webhook payloads to the configured route.\n",
+                    "text/plain"
+                )
+        );
 
         _ = app.MapKoFiWebhook(
             configuration.WebhookPath,
@@ -89,7 +92,8 @@ internal static class SampleApplication
             {
                 lock (consoleLock)
                 {
-                    string remoteIp = httpContext.Connection.RemoteIpAddress?.ToString() ?? "unknown";
+                    string remoteIp =
+                        httpContext.Connection.RemoteIpAddress?.ToString() ?? "unknown";
                     string requestId = httpContext.TraceIdentifier;
 
                     string auth = result.IsAuthenticated ? "[green]yes[/]" : "[red]no[/]";
@@ -97,16 +101,20 @@ internal static class SampleApplication
                     string status = $"[blue]{result.Response.StatusCode}[/]";
 
                     AnsiConsole.MarkupLineInterpolated(
-                        $"[grey]Request[/] [white]{Markup.Escape(requestId)}[/] from [white]{Markup.Escape(remoteIp)}[/] -> status {status}, authenticated {auth}, known event {known}.");
+                        $"[grey]Request[/] [white]{Markup.Escape(requestId)}[/] from [white]{Markup.Escape(remoteIp)}[/] -> status {status}, authenticated {auth}, known event {known}."
+                    );
 
                     if (!string.IsNullOrWhiteSpace(result.FailureReason))
                     {
-                        AnsiConsole.MarkupLineInterpolated($"[yellow]Reason:[/] {Markup.Escape(result.FailureReason)}");
+                        AnsiConsole.MarkupLineInterpolated(
+                            $"[yellow]Reason:[/] {Markup.Escape(result.FailureReason)}"
+                        );
                     }
                 }
 
                 await Task.CompletedTask.ConfigureAwait(false);
-            });
+            }
+        );
 
         string localBaseUrl = $"http://127.0.0.1:{configuration.LocalPort}";
 
@@ -118,13 +126,20 @@ internal static class SampleApplication
 
         if (configuration.UseDevTunnels)
         {
-            devTunnelsRuntime = await StartDevTunnelsAsync(configuration, cancellationToken).ConfigureAwait(false);
+            devTunnelsRuntime = await StartDevTunnelsAsync(configuration, cancellationToken)
+                .ConfigureAwait(false);
             RenderTunnelSummary(configuration, devTunnelsRuntime.PublicBaseUrl);
         }
 
         RenderUsageInstructions(configuration, localBaseUrl, devTunnelsRuntime?.PublicBaseUrl);
 
-        await RunCommandLoopAsync(configuration, receivedEvents, devTunnelsRuntime, consoleLock, cancellationToken)
+        await RunCommandLoopAsync(
+                configuration,
+                receivedEvents,
+                devTunnelsRuntime,
+                consoleLock,
+                cancellationToken
+            )
             .ConfigureAwait(false);
 
         if (devTunnelsRuntime is not null)
@@ -142,14 +157,18 @@ internal static class SampleApplication
             new TextPrompt<int>("Local [green]HTTP port[/]?")
                 .DefaultValue(5073)
                 .ValidationErrorMessage("[red]Please enter a valid port.[/]")
-                .Validate(port => port is > 0 and <= 65535
-                    ? ValidationResult.Success()
-                    : ValidationResult.Error("[red]Port must be between 1 and 65535.[/]")));
+                .Validate(port =>
+                    port is > 0 and <= 65535
+                        ? ValidationResult.Success()
+                        : ValidationResult.Error("[red]Port must be between 1 and 65535.[/]")
+                )
+        );
 
         string webhookPath = AnsiConsole.Prompt(
             new TextPrompt<string>("Webhook [green]path[/]?")
                 .DefaultValue("/webhooks/kofi/events")
-                .AllowEmpty());
+                .AllowEmpty()
+        );
 
         if (string.IsNullOrWhiteSpace(webhookPath))
         {
@@ -164,9 +183,13 @@ internal static class SampleApplication
         string verificationToken = AnsiConsole.Prompt(
             new TextPrompt<string>("Ko-fi [green]verification token[/]?")
                 .PromptStyle("hotpink")
-                .Secret());
+                .Secret()
+        );
 
-        bool useDevTunnels = AnsiConsole.Confirm("Use [green]Azure Dev Tunnels[/] for a public HTTPS URL?", true);
+        bool useDevTunnels = AnsiConsole.Confirm(
+            "Use [green]Azure Dev Tunnels[/] for a public HTTPS URL?",
+            true
+        );
 
         string tunnelId = "kofi-client-sample";
         LoginProvider loginProvider = LoginProvider.GitHub;
@@ -176,7 +199,8 @@ internal static class SampleApplication
             tunnelId = AnsiConsole.Prompt(
                 new TextPrompt<string>("Dev Tunnel [green]tunnel ID[/]?")
                     .DefaultValue("kofi-client-sample")
-                    .AllowEmpty());
+                    .AllowEmpty()
+            );
 
             if (string.IsNullOrWhiteSpace(tunnelId))
             {
@@ -186,7 +210,8 @@ internal static class SampleApplication
             loginProvider = AnsiConsole.Prompt(
                 new SelectionPrompt<LoginProvider>()
                     .Title("Login provider for [green]devtunnel[/]?")
-                    .AddChoices(LoginProvider.GitHub, LoginProvider.Microsoft));
+                    .AddChoices(LoginProvider.GitHub, LoginProvider.Microsoft)
+            );
         }
 
         return new SampleConfiguration(
@@ -195,71 +220,88 @@ internal static class SampleApplication
             VerificationToken: verificationToken,
             UseDevTunnels: useDevTunnels,
             TunnelId: tunnelId,
-            LoginProvider: loginProvider);
+            LoginProvider: loginProvider
+        );
     }
 
     private static async Task<DevTunnelsRuntime> StartDevTunnelsAsync(
         SampleConfiguration configuration,
-        CancellationToken cancellationToken)
+        CancellationToken cancellationToken
+    )
     {
         AnsiConsole.WriteLine();
         AnsiConsole.MarkupLine("[bold]Azure Dev Tunnels walkthrough[/]");
         AnsiConsole.WriteLine();
 
-        DevTunnelsClient client = new(new DevTunnelsClientOptions
-        {
-            CommandTimeout = TimeSpan.FromSeconds(20),
-        });
+        DevTunnelsClient client = new(
+            new DevTunnelsClientOptions { CommandTimeout = TimeSpan.FromSeconds(20) }
+        );
 
-        DevTunnelCliProbeResult probe = await client.ProbeCliAsync(cancellationToken).ConfigureAwait(false);
+        DevTunnelCliProbeResult probe = await client
+            .ProbeCliAsync(cancellationToken)
+            .ConfigureAwait(false);
 
         if (!probe.IsInstalled)
         {
             throw new InvalidOperationException(
-                "The devtunnel CLI is not installed or could not be found. " +
-                "Install it first, then re-run the sample.");
+                "The devtunnel CLI is not installed or could not be found. "
+                    + "Install it first, then re-run the sample."
+            );
         }
 
-        AnsiConsole.MarkupLineInterpolated($"[green]CLI found:[/] devtunnel [white]{Markup.Escape(probe.Version?.ToString() ?? "unknown")}[/]");
+        AnsiConsole.MarkupLineInterpolated(
+            $"[green]CLI found:[/] devtunnel [white]{Markup.Escape(probe.Version?.ToString() ?? "unknown")}[/]"
+        );
 
         AnsiConsole.MarkupLineInterpolated(
-            $"[grey]Ensuring login with[/] [white]{Markup.Escape(configuration.LoginProvider.ToString())}[/][grey]...[/]");
+            $"[grey]Ensuring login with[/] [white]{Markup.Escape(configuration.LoginProvider.ToString())}[/][grey]...[/]"
+        );
 
-        _ = await client.EnsureLoggedInAsync(configuration.LoginProvider, cancellationToken).ConfigureAwait(false);
+        _ = await client
+            .EnsureLoggedInAsync(configuration.LoginProvider, cancellationToken)
+            .ConfigureAwait(false);
 
         AnsiConsole.MarkupLine("[green]Login confirmed.[/]");
 
-        _ = await client.CreateOrUpdateTunnelAsync(
-            configuration.TunnelId,
-            new DevTunnelOptions
-            {
-                Description = "KoFi.Client.Sample tunnel",
-                AllowAnonymous = true,
-            },
-            cancellationToken).ConfigureAwait(false);
+        _ = await client
+            .CreateOrUpdateTunnelAsync(
+                configuration.TunnelId,
+                new DevTunnelOptions
+                {
+                    Description = "KoFi.Client.Sample tunnel",
+                    AllowAnonymous = true,
+                },
+                cancellationToken
+            )
+            .ConfigureAwait(false);
 
-        _ = await client.CreateOrReplacePortAsync(
-            configuration.TunnelId,
-            configuration.LocalPort,
-            new DevTunnelPortOptions
-            {
-                Protocol = "http",
-            },
-            cancellationToken).ConfigureAwait(false);
+        _ = await client
+            .CreateOrReplacePortAsync(
+                configuration.TunnelId,
+                configuration.LocalPort,
+                new DevTunnelPortOptions { Protocol = "http" },
+                cancellationToken
+            )
+            .ConfigureAwait(false);
 
-        IDevTunnelHostSession session = await client.StartHostSessionAsync(
-            new DevTunnelHostStartOptions
-            {
-                TunnelId = configuration.TunnelId,
-            },
-            cancellationToken).ConfigureAwait(false);
+        IDevTunnelHostSession session = await client
+            .StartHostSessionAsync(
+                new DevTunnelHostStartOptions { TunnelId = configuration.TunnelId },
+                cancellationToken
+            )
+            .ConfigureAwait(false);
 
         await session.WaitForReadyAsync(cancellationToken).ConfigureAwait(false);
 
-        Uri publicBaseUrl = session.PublicUrl
-            ?? throw new InvalidOperationException("The Dev Tunnel host session became ready without a public URL.");
+        Uri publicBaseUrl =
+            session.PublicUrl
+            ?? throw new InvalidOperationException(
+                "The Dev Tunnel host session became ready without a public URL."
+            );
 
-        AnsiConsole.MarkupLineInterpolated($"[green]Tunnel ready:[/] [link]{Markup.Escape(publicBaseUrl.ToString())}[/]");
+        AnsiConsole.MarkupLineInterpolated(
+            $"[green]Tunnel ready:[/] [link]{Markup.Escape(publicBaseUrl.ToString())}[/]"
+        );
 
         return new DevTunnelsRuntime(session, publicBaseUrl);
     }
@@ -278,17 +320,25 @@ internal static class SampleApplication
         _ = table.AddRow("Webhook path", $"[white]{Markup.Escape(configuration.WebhookPath)}[/]");
         _ = table.AddRow("Local webhook URL", $"[white]{Markup.Escape(localWebhookUrl)}[/]");
         _ = table.AddRow("Verification token", "[grey](hidden)[/]");
-        _ = table.AddRow("Dev Tunnels enabled", configuration.UseDevTunnels ? "[green]yes[/]" : "[yellow]no[/]");
+        _ = table.AddRow(
+            "Dev Tunnels enabled",
+            configuration.UseDevTunnels ? "[green]yes[/]" : "[yellow]no[/]"
+        );
 
-        AnsiConsole.Write(new Panel(table)
-            .Header("[bold]Local runtime[/]")
-            .Border(BoxBorder.Rounded)
-            .BorderColor(Color.HotPink));
+        AnsiConsole.Write(
+            new Panel(table)
+                .Header("[bold]Local runtime[/]")
+                .Border(BoxBorder.Rounded)
+                .BorderColor(Color.HotPink)
+        );
     }
 
     private static void RenderTunnelSummary(SampleConfiguration configuration, Uri publicBaseUrl)
     {
-        string publicWebhookUrl = CombineUrl(publicBaseUrl.ToString().TrimEnd('/'), configuration.WebhookPath);
+        string publicWebhookUrl = CombineUrl(
+            publicBaseUrl.ToString().TrimEnd('/'),
+            configuration.WebhookPath
+        );
 
         Table table = new Table()
             .RoundedBorder()
@@ -300,16 +350,19 @@ internal static class SampleApplication
         _ = table.AddRow("Public base URL", $"[white]{Markup.Escape(publicBaseUrl.ToString())}[/]");
         _ = table.AddRow("Public webhook URL", $"[white]{Markup.Escape(publicWebhookUrl)}[/]");
 
-        AnsiConsole.Write(new Panel(table)
-            .Header("[bold]Public tunnel[/]")
-            .Border(BoxBorder.Rounded)
-            .BorderColor(Color.Green));
+        AnsiConsole.Write(
+            new Panel(table)
+                .Header("[bold]Public tunnel[/]")
+                .Border(BoxBorder.Rounded)
+                .BorderColor(Color.Green)
+        );
     }
 
     private static void RenderUsageInstructions(
         SampleConfiguration configuration,
         string localBaseUrl,
-        Uri? publicBaseUrl)
+        Uri? publicBaseUrl
+    )
     {
         string localWebhookUrl = CombineUrl(localBaseUrl, configuration.WebhookPath);
         string? publicWebhookUrl = publicBaseUrl is null
@@ -326,15 +379,20 @@ internal static class SampleApplication
             new Text(string.Empty),
             new Markup($"[grey]Local webhook URL:[/] [white]{Markup.Escape(localWebhookUrl)}[/]"),
             publicWebhookUrl is not null
-                ? new Markup($"[grey]Public webhook URL:[/] [white]{Markup.Escape(publicWebhookUrl)}[/]")
+                ? new Markup(
+                    $"[grey]Public webhook URL:[/] [white]{Markup.Escape(publicWebhookUrl)}[/]"
+                )
                 : new Markup("[grey]Public webhook URL:[/] [yellow](Dev Tunnels disabled)[/]"),
             new Text(string.Empty),
-            new Markup("[grey]Commands are available below while the sample is running.[/]"));
+            new Markup("[grey]Commands are available below while the sample is running.[/]")
+        );
 
-        AnsiConsole.Write(new Panel(rows)
-            .Header("[bold]How to use the sample[/]")
-            .Border(BoxBorder.Rounded)
-            .BorderColor(Color.Blue));
+        AnsiConsole.Write(
+            new Panel(rows)
+                .Header("[bold]How to use the sample[/]")
+                .Border(BoxBorder.Rounded)
+                .BorderColor(Color.Blue)
+        );
     }
 
     private static async Task RunCommandLoopAsync(
@@ -342,7 +400,8 @@ internal static class SampleApplication
         ConcurrentQueue<KoFiWebhookEvent> receivedEvents,
         DevTunnelsRuntime? devTunnelsRuntime,
         object consoleLock,
-        CancellationToken cancellationToken)
+        CancellationToken cancellationToken
+    )
     {
         while (!cancellationToken.IsCancellationRequested)
         {
@@ -355,7 +414,9 @@ internal static class SampleApplication
                         "Show webhook URLs",
                         "Show recent events",
                         "Show sample payload hint",
-                        "Exit"));
+                        "Exit"
+                    )
+            );
 
             switch (command)
             {
@@ -363,7 +424,10 @@ internal static class SampleApplication
                     lock (consoleLock)
                     {
                         string localBaseUrl = $"http://127.0.0.1:{configuration.LocalPort}";
-                        string localWebhookUrl = CombineUrl(localBaseUrl, configuration.WebhookPath);
+                        string localWebhookUrl = CombineUrl(
+                            localBaseUrl,
+                            configuration.WebhookPath
+                        );
 
                         Table table = new Table()
                             .RoundedBorder()
@@ -376,9 +440,13 @@ internal static class SampleApplication
                         {
                             string publicWebhookUrl = CombineUrl(
                                 devTunnelsRuntime.PublicBaseUrl.ToString().TrimEnd('/'),
-                                configuration.WebhookPath);
+                                configuration.WebhookPath
+                            );
 
-                            _ = table.AddRow("Public", $"[white]{Markup.Escape(publicWebhookUrl)}[/]");
+                            _ = table.AddRow(
+                                "Public",
+                                $"[white]{Markup.Escape(publicWebhookUrl)}[/]"
+                            );
                         }
 
                         AnsiConsole.Write(table);
@@ -412,7 +480,8 @@ internal static class SampleApplication
                                 Markup.Escape(evt.FromName ?? "(anonymous)"),
                                 evt.Amount.ToString("0.00"),
                                 Markup.Escape(evt.Currency),
-                                Markup.Escape(evt.Timestamp.ToString("u")));
+                                Markup.Escape(evt.Timestamp.ToString("u"))
+                            );
                         }
 
                         AnsiConsole.Write(table);
@@ -423,10 +492,12 @@ internal static class SampleApplication
                 case "Show sample payload hint":
                     lock (consoleLock)
                     {
-                        AnsiConsole.Write(new Panel(GetSamplePayloadHint(configuration.VerificationToken))
-                            .Header("[bold]Example Ko-fi form body[/]")
-                            .Border(BoxBorder.Rounded)
-                            .BorderColor(Color.Yellow));
+                        AnsiConsole.Write(
+                            new Panel(GetSamplePayloadHint(configuration.VerificationToken))
+                                .Header("[bold]Example Ko-fi form body[/]")
+                                .Border(BoxBorder.Rounded)
+                                .BorderColor(Color.Yellow)
+                        );
                     }
 
                     break;
@@ -457,10 +528,12 @@ internal static class SampleApplication
             _ = grid.AddRow("[bold]Message[/]", Markup.Escape(evt.Message));
         }
 
-        AnsiConsole.Write(new Panel(grid)
-            .Header("[bold green]Webhook event received[/]")
-            .Border(BoxBorder.Rounded)
-            .BorderColor(Color.Green));
+        AnsiConsole.Write(
+            new Panel(grid)
+                .Header("[bold green]Webhook event received[/]")
+                .Border(BoxBorder.Rounded)
+                .BorderColor(Color.Green)
+        );
     }
 
     private static string GetEventDisplayName(KoFiWebhookEvent evt)
@@ -487,14 +560,15 @@ internal static class SampleApplication
     private static string GetSamplePayloadHint(string verificationToken)
     {
         return """
-        Ko-fi posts application/x-www-form-urlencoded with a single field named data.
+                Ko-fi posts application/x-www-form-urlencoded with a single field named data.
 
-        Example form field value:
-        data={"verification_token":"REPLACE_TOKEN","message_id":"sample-message-id","timestamp":"2026-03-17T12:00:00Z","type":"Donation","is_public":true,"from_name":"Sample Supporter","message":"Hello from the sample","amount":"5.00","url":"https://ko-fi.com","email":"supporter@example.com","currency":"EUR","is_subscription_payment":false,"is_first_subscription_payment":false,"kofi_transaction_id":"txn_123","tier_name":null,"discord_username":null,"discord_user_id":null}
+                Example form field value:
+                data={"verification_token":"REPLACE_TOKEN","message_id":"sample-message-id","timestamp":"2026-03-17T12:00:00Z","type":"Donation","is_public":true,"from_name":"Sample Supporter","message":"Hello from the sample","amount":"5.00","url":"https://ko-fi.com","email":"supporter@example.com","currency":"EUR","is_subscription_payment":false,"is_first_subscription_payment":false,"kofi_transaction_id":"txn_123","tier_name":null,"discord_username":null,"discord_user_id":null}
 
-        Replace REPLACE_TOKEN with the configured verification token:
-        """
-        + Environment.NewLine + verificationToken;
+                Replace REPLACE_TOKEN with the configured verification token:
+                """
+            + Environment.NewLine
+            + verificationToken;
     }
 
     private sealed record SampleConfiguration(
@@ -503,18 +577,16 @@ internal static class SampleApplication
         string VerificationToken,
         bool UseDevTunnels,
         string TunnelId,
-        LoginProvider LoginProvider);
+        LoginProvider LoginProvider
+    );
 
     /// <summary>
     /// Initializes a new instance of the <see cref="DevTunnelsRuntime"/> class.
     /// </summary>
     /// <param name="session">The live host session returned by the client.</param>
     /// <param name="publicBaseUrl">The public base URL exposed by the tunnel.</param>
-    private sealed class DevTunnelsRuntime(
-        dynamic session,
-        Uri publicBaseUrl)
+    private sealed class DevTunnelsRuntime(dynamic session, Uri publicBaseUrl)
     {
-
         /// <summary>
         /// Gets the active host session.
         /// </summary>

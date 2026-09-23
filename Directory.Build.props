@@ -21,8 +21,8 @@
     <RepositoryUrl>https://github.com/Agash/KoFi.Client</RepositoryUrl>
     <PackageTags>ko-fi;kofi;donations;creator-economy;webhooks;api-client;dotnet;csharp;aot;nativeaot</PackageTags>
     <PackageProjectUrl>https://github.com/Agash/KoFi.Client</PackageProjectUrl>
-    <GenerateDocumentationFile Condition="'$(IsPackable)' == 'true'">true</GenerateDocumentationFile>
+    <GenerateDocumentationFile Condition="'$(IsPackable)' == 'true'"
+      >true</GenerateDocumentationFile>
     <PackageReadmeFile>README.md</PackageReadmeFile>
   </PropertyGroup>
-
 </Project>

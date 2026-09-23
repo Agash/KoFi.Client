@@ -31,5 +31,6 @@ public interface IKoFiWebhookHandler
     Task<WebhookHandleResult<KoFiWebhookEvent>> HandleAsync(
         WebhookRequest request,
         KoFiWebhookOptions options,
-        CancellationToken cancellationToken = default);
+        CancellationToken cancellationToken = default
+    );
 }

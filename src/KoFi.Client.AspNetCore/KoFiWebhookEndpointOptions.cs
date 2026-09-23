@@ -18,7 +18,11 @@ public sealed class KoFiWebhookEndpointOptions
     /// This is intentionally request-based so host applications can resolve tokens and other
     /// configuration from instance-scoped settings, route values, or custom stores.
     /// </remarks>
-    public required Func<HttpContext, CancellationToken, Task<KoFiWebhookOptions>> ResolveWebhookOptionsAsync { get; set; }
+    public required Func<
+        HttpContext,
+        CancellationToken,
+        Task<KoFiWebhookOptions>
+    > ResolveWebhookOptionsAsync { get; set; }
 
     /// <summary>
     /// Gets or sets an optional callback invoked after a normalized Ko-fi event has been
@@ -34,5 +38,10 @@ public sealed class KoFiWebhookEndpointOptions
     /// Gets or sets an optional callback invoked after the Ko-fi handler completes, regardless
     /// of whether it produced a normalized event.
     /// </summary>
-    public Func<WebhookHandleResult<KoFiWebhookEvent>, HttpContext, CancellationToken, Task>? OnResultAsync { get; set; }
+    public Func<
+        WebhookHandleResult<KoFiWebhookEvent>,
+        HttpContext,
+        CancellationToken,
+        Task
+    >? OnResultAsync { get; set; }
 }
