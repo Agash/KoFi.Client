@@ -27,6 +27,7 @@ internal static class ConstantTimeStringComparer
         byte[] leftBytes = Encoding.UTF8.GetBytes(left);
         byte[] rightBytes = Encoding.UTF8.GetBytes(right);
 
-        return leftBytes.Length == rightBytes.Length && CryptographicOperations.FixedTimeEquals(leftBytes, rightBytes);
+        return leftBytes.Length == rightBytes.Length
+            && CryptographicOperations.FixedTimeEquals(leftBytes, rightBytes);
     }
 }

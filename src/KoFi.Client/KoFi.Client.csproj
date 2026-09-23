@@ -1,29 +1,29 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
-	<PropertyGroup>
-		<TargetFrameworks>net9.0;net10.0;net11.0</TargetFrameworks>
+  <PropertyGroup>
+    <TargetFrameworks>net9.0;net10.0;net11.0</TargetFrameworks>
     <IsAotCompatible>true</IsAotCompatible>
-		<ImplicitUsings>enable</ImplicitUsings>
-		<Nullable>enable</Nullable>
-		<LangVersion>preview</LangVersion>
-		<TreatWarningsAsErrors>true</TreatWarningsAsErrors>
-		<GenerateDocumentationFile>true</GenerateDocumentationFile>
-		<IsPackable>true</IsPackable>
-		<PackageId>KoFi.Client</PackageId>
-		<Title>KoFi.Client</Title>
-		<Authors>Agash</Authors>
-		<Company>Agash</Company>
-		<Description>Typed, transport-neutral .NET client library for Ko-fi webhook processing.</Description>
-		<PackageLicenseExpression>MIT</PackageLicenseExpression>
-		<RepositoryUrl>https://github.com/Agash/KoFi.Client</RepositoryUrl>
-		<RepositoryType>git</RepositoryType>
-		<PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
-		<MinVerTagPrefix>v</MinVerTagPrefix>
-		<EmbedUntrackedSources>true</EmbedUntrackedSources>
-	</PropertyGroup>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <LangVersion>preview</LangVersion>
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <IsPackable>true</IsPackable>
+    <PackageId>KoFi.Client</PackageId>
+    <Title>KoFi.Client</Title>
+    <Authors>Agash</Authors>
+    <Company>Agash</Company>
+    <Description>Typed, transport-neutral .NET client library for Ko-fi webhook processing.</Description>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <RepositoryUrl>https://github.com/Agash/KoFi.Client</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
+    <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
+    <MinVerTagPrefix>v</MinVerTagPrefix>
+    <EmbedUntrackedSources>true</EmbedUntrackedSources>
+  </PropertyGroup>
 
-	<ItemGroup>
-		<PackageReference Include="Agash.Webhook.Abstractions" Version="1.0.2" />
-		<PackageReference Include="MinVer" Version="8.0.0" PrivateAssets="all" />
-		<PackageReference Include="DotNet.ReproducibleBuilds" Version="2.0.5" PrivateAssets="all" />
-	</ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="Agash.Webhook.Abstractions" Version="1.0.2" />
+    <PackageReference Include="MinVer" Version="8.0.0" PrivateAssets="all" />
+    <PackageReference Include="DotNet.ReproducibleBuilds" Version="2.0.5" PrivateAssets="all" />
+  </ItemGroup>
 </Project>

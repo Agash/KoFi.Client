@@ -1,30 +1,30 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
-	<PropertyGroup>
-		<TargetFramework>net10.0</TargetFramework>
-		<OutputType>Exe</OutputType>
-		<ImplicitUsings>enable</ImplicitUsings>
-		<Nullable>enable</Nullable>
-		<LangVersion>preview</LangVersion>
-		<TreatWarningsAsErrors>true</TreatWarningsAsErrors>
-		<IsPackable>false</IsPackable>
-		<GenerateDocumentationFile>false</GenerateDocumentationFile>
-		<EnforceCodeStyleInBuild>false</EnforceCodeStyleInBuild>
-		<NoWarn>$(NoWarn);CA1305</NoWarn>
-		<UserSecretsId>KoFi.Client.Sample</UserSecretsId>
-	</PropertyGroup>
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <OutputType>Exe</OutputType>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <LangVersion>preview</LangVersion>
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+    <IsPackable>false</IsPackable>
+    <GenerateDocumentationFile>false</GenerateDocumentationFile>
+    <EnforceCodeStyleInBuild>false</EnforceCodeStyleInBuild>
+    <NoWarn>$(NoWarn);CA1305</NoWarn>
+    <UserSecretsId>KoFi.Client.Sample</UserSecretsId>
+  </PropertyGroup>
 
-	<ItemGroup>
-		<ProjectReference Include="..\..\src\KoFi.Client.DependencyInjection\KoFi.Client.DependencyInjection.csproj" />
-		<ProjectReference Include="..\..\src\KoFi.Client\KoFi.Client.csproj" />
-		<ProjectReference Include="..\..\src\KoFi.Client.AspNetCore\KoFi.Client.AspNetCore.csproj" />
-	</ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\src\KoFi.Client.DependencyInjection\KoFi.Client.DependencyInjection.csproj" />
+    <ProjectReference Include="..\..\src\KoFi.Client\KoFi.Client.csproj" />
+    <ProjectReference Include="..\..\src\KoFi.Client.AspNetCore\KoFi.Client.AspNetCore.csproj" />
+  </ItemGroup>
 
-	<ItemGroup>
-		<PackageReference Include="DevTunnels.Client" Version="1.1.0" />
-		<PackageReference Include="Spectre.Console" Version="0.57.2" />
-	</ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="DevTunnels.Client" Version="1.1.0" />
+    <PackageReference Include="Spectre.Console" Version="0.57.2" />
+  </ItemGroup>
 
-	<ItemGroup>
-		<FrameworkReference Include="Microsoft.AspNetCore.App" />
-	</ItemGroup>
+  <ItemGroup>
+    <FrameworkReference Include="Microsoft.AspNetCore.App" />
+  </ItemGroup>
 </Project>

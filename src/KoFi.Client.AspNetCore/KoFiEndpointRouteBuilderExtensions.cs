@@ -30,7 +30,8 @@ public static class KoFiEndpointRouteBuilderExtensions
     public static IEndpointConventionBuilder MapKoFiWebhook(
         this IEndpointRouteBuilder endpoints,
         string pattern,
-        Action<KoFiWebhookEndpointOptions> configure)
+        Action<KoFiWebhookEndpointOptions> configure
+    )
     {
         ArgumentNullException.ThrowIfNull(endpoints);
         ArgumentException.ThrowIfNullOrEmpty(pattern);
@@ -38,42 +39,50 @@ public static class KoFiEndpointRouteBuilderExtensions
 
         KoFiWebhookEndpointOptions options = new()
         {
-            ResolveWebhookOptionsAsync = static (_, _) => Task.FromResult(new KoFiWebhookOptions
-            {
-                VerificationToken = string.Empty,
-            }),
+            ResolveWebhookOptionsAsync = static (_, _) =>
+                Task.FromResult(new KoFiWebhookOptions { VerificationToken = string.Empty }),
         };
 
         configure(options);
 
-        IEndpointConventionBuilder builder = endpoints.MapPost(pattern, async context =>
-        {
-            IKoFiWebhookHandler handler = context.RequestServices.GetRequiredService<IKoFiWebhookHandler>();
+        IEndpointConventionBuilder builder = endpoints.MapPost(
+            pattern,
+            async context =>
+            {
+                IKoFiWebhookHandler handler =
+                    context.RequestServices.GetRequiredService<IKoFiWebhookHandler>();
 
-            KoFiWebhookOptions webhookOptions =
-                await options.ResolveWebhookOptionsAsync(context, context.RequestAborted).ConfigureAwait(false);
-
-            WebhookRequest request =
-                await HttpContextWebhookRequestMapper.FromHttpContextAsync(context, context.RequestAborted)
+                KoFiWebhookOptions webhookOptions = await options
+                    .ResolveWebhookOptionsAsync(context, context.RequestAborted)
                     .ConfigureAwait(false);
 
-            WebhookHandleResult<KoFiWebhookEvent> result =
-                await handler.HandleAsync(request, webhookOptions, context.RequestAborted)
+                WebhookRequest request = await HttpContextWebhookRequestMapper
+                    .FromHttpContextAsync(context, context.RequestAborted)
                     .ConfigureAwait(false);
 
-            if (result.Event is KoFiWebhookEvent evt && options.OnEventAsync is not null)
-            {
-                await options.OnEventAsync(evt, context, context.RequestAborted).ConfigureAwait(false);
-            }
+                WebhookHandleResult<KoFiWebhookEvent> result = await handler
+                    .HandleAsync(request, webhookOptions, context.RequestAborted)
+                    .ConfigureAwait(false);
 
-            if (options.OnResultAsync is not null)
-            {
-                await options.OnResultAsync(result, context, context.RequestAborted).ConfigureAwait(false);
-            }
+                if (result.Event is KoFiWebhookEvent evt && options.OnEventAsync is not null)
+                {
+                    await options
+                        .OnEventAsync(evt, context, context.RequestAborted)
+                        .ConfigureAwait(false);
+                }
 
-            await WebhookResponseHttpContextWriter.WriteAsync(context, result.Response, context.RequestAborted)
-                .ConfigureAwait(false);
-        });
+                if (options.OnResultAsync is not null)
+                {
+                    await options
+                        .OnResultAsync(result, context, context.RequestAborted)
+                        .ConfigureAwait(false);
+                }
+
+                await WebhookResponseHttpContextWriter
+                    .WriteAsync(context, result.Response, context.RequestAborted)
+                    .ConfigureAwait(false);
+            }
+        );
 
         return builder;
     }
@@ -100,7 +109,13 @@ public static class KoFiEndpointRouteBuilderExtensions
         string pattern,
         Func<HttpContext, CancellationToken, Task<KoFiWebhookOptions>> resolveWebhookOptionsAsync,
         Func<KoFiWebhookEvent, HttpContext, CancellationToken, Task>? onEventAsync = null,
-        Func<WebhookHandleResult<KoFiWebhookEvent>, HttpContext, CancellationToken, Task>? onResultAsync = null)
+        Func<
+            WebhookHandleResult<KoFiWebhookEvent>,
+            HttpContext,
+            CancellationToken,
+            Task
+        >? onResultAsync = null
+    )
     {
         ArgumentNullException.ThrowIfNull(resolveWebhookOptionsAsync);
 
@@ -111,7 +126,8 @@ public static class KoFiEndpointRouteBuilderExtensions
                 options.ResolveWebhookOptionsAsync = resolveWebhookOptionsAsync;
                 options.OnEventAsync = onEventAsync;
                 options.OnResultAsync = onResultAsync;
-            });
+            }
+        );
     }
 
     /// <summary>
@@ -136,43 +152,53 @@ public static class KoFiEndpointRouteBuilderExtensions
         string pattern,
         string verificationToken,
         Func<KoFiWebhookEvent, HttpContext, CancellationToken, Task>? onEventAsync = null,
-        Func<WebhookHandleResult<KoFiWebhookEvent>, HttpContext, CancellationToken, Task>? onResultAsync = null)
+        Func<
+            WebhookHandleResult<KoFiWebhookEvent>,
+            HttpContext,
+            CancellationToken,
+            Task
+        >? onResultAsync = null
+    )
     {
         ArgumentNullException.ThrowIfNull(endpoints);
         ArgumentException.ThrowIfNullOrEmpty(pattern);
         ArgumentException.ThrowIfNullOrEmpty(verificationToken);
 
-        IEndpointConventionBuilder builder = endpoints.MapPost(pattern, async context =>
-        {
-            IKoFiWebhookHandler handler = context.RequestServices.GetRequiredService<IKoFiWebhookHandler>();
+        IEndpointConventionBuilder builder = endpoints.MapPost(
+            pattern,
+            async context =>
+            {
+                IKoFiWebhookHandler handler =
+                    context.RequestServices.GetRequiredService<IKoFiWebhookHandler>();
 
-            WebhookRequest request =
-                await HttpContextWebhookRequestMapper.FromHttpContextAsync(context, context.RequestAborted)
+                WebhookRequest request = await HttpContextWebhookRequestMapper
+                    .FromHttpContextAsync(context, context.RequestAborted)
                     .ConfigureAwait(false);
 
-            WebhookHandleResult<KoFiWebhookEvent> result =
-                await handler.HandleAsync(
+                WebhookHandleResult<KoFiWebhookEvent> result = await handler
+                    .HandleAsync(
                         request,
-                        new KoFiWebhookOptions
-                        {
-                            VerificationToken = verificationToken,
-                        },
-                        context.RequestAborted)
+                        new KoFiWebhookOptions { VerificationToken = verificationToken },
+                        context.RequestAborted
+                    )
                     .ConfigureAwait(false);
 
-            if (result.Event is KoFiWebhookEvent evt && onEventAsync is not null)
-            {
-                await onEventAsync(evt, context, context.RequestAborted).ConfigureAwait(false);
-            }
+                if (result.Event is KoFiWebhookEvent evt && onEventAsync is not null)
+                {
+                    await onEventAsync(evt, context, context.RequestAborted).ConfigureAwait(false);
+                }
 
-            if (onResultAsync is not null)
-            {
-                await onResultAsync(result, context, context.RequestAborted).ConfigureAwait(false);
-            }
+                if (onResultAsync is not null)
+                {
+                    await onResultAsync(result, context, context.RequestAborted)
+                        .ConfigureAwait(false);
+                }
 
-            await WebhookResponseHttpContextWriter.WriteAsync(context, result.Response, context.RequestAborted)
-                .ConfigureAwait(false);
-        });
+                await WebhookResponseHttpContextWriter
+                    .WriteAsync(context, result.Response, context.RequestAborted)
+                    .ConfigureAwait(false);
+            }
+        );
 
         _ = builder.WithMetadata(new KoFiFixedVerificationTokenMetadata(verificationToken));
 

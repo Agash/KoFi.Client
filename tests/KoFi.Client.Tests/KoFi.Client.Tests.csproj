@@ -1,5 +1,4 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
-
   <PropertyGroup>
     <TargetFrameworks>net10.0;net11.0</TargetFrameworks>
     <ImplicitUsings>enable</ImplicitUsings>
@@ -17,9 +16,6 @@
          Roslyn errors asking for it rather than staying silent. CA1707/IDE1006 cover test naming,
          CA1515 fires only because OutputType=Exe, CA2007 is noise in test bodies. -->
     <NoWarn>$(NoWarn);IDE0005;IDE1006;CA1707</NoWarn>
-
-
-
   </PropertyGroup>
 
   <ItemGroup>
@@ -36,5 +32,4 @@
     <ProjectReference Include="..\..\src\KoFi.Client\KoFi.Client.csproj" />
     <ProjectReference Include="..\..\src\KoFi.Client.AspNetCore\KoFi.Client.AspNetCore.csproj" />
   </ItemGroup>
-
 </Project>

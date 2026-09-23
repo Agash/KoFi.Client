@@ -1,13 +1,13 @@
-﻿using Agash.Webhook.Abstractions;
+﻿using System.Globalization;
+using System.Text;
+using System.Text.Json;
+using Agash.Webhook.Abstractions;
 using KoFi.Client.Abstractions;
 using KoFi.Client.Events;
 using KoFi.Client.Internal;
 using KoFi.Client.Json;
 using KoFi.Client.Models;
 using KoFi.Client.Options;
-using System.Globalization;
-using System.Text;
-using System.Text.Json;
 
 namespace KoFi.Client.Webhooks;
 
@@ -28,7 +28,8 @@ public sealed class KoFiWebhookHandler : IKoFiWebhookHandler
     public Task<WebhookHandleResult<KoFiWebhookEvent>> HandleAsync(
         WebhookRequest request,
         KoFiWebhookOptions options,
-        CancellationToken cancellationToken = default)
+        CancellationToken cancellationToken = default
+    )
     {
         ArgumentNullException.ThrowIfNull(request);
         ArgumentNullException.ThrowIfNull(options);
@@ -38,26 +39,31 @@ public sealed class KoFiWebhookHandler : IKoFiWebhookHandler
 
         if (!string.Equals(request.Method, "POST", StringComparison.OrdinalIgnoreCase))
         {
-            return Task.FromResult(new WebhookHandleResult<KoFiWebhookEvent>
-            {
-                Response = WebhookResponse.Empty(405),
-                IsAuthenticated = false,
-                IsKnownEvent = false,
-                Event = null,
-                FailureReason = "Unsupported HTTP method. Ko-fi webhooks must use POST.",
-            });
+            return Task.FromResult(
+                new WebhookHandleResult<KoFiWebhookEvent>
+                {
+                    Response = WebhookResponse.Empty(405),
+                    IsAuthenticated = false,
+                    IsKnownEvent = false,
+                    Event = null,
+                    FailureReason = "Unsupported HTTP method. Ko-fi webhooks must use POST.",
+                }
+            );
         }
 
         if (!request.HasContentType(FormUrlEncodedContentType))
         {
-            return Task.FromResult(new WebhookHandleResult<KoFiWebhookEvent>
-            {
-                Response = WebhookResponse.Empty(400),
-                IsAuthenticated = false,
-                IsKnownEvent = false,
-                Event = null,
-                FailureReason = "Unsupported content type. Expected application/x-www-form-urlencoded.",
-            });
+            return Task.FromResult(
+                new WebhookHandleResult<KoFiWebhookEvent>
+                {
+                    Response = WebhookResponse.Empty(400),
+                    IsAuthenticated = false,
+                    IsKnownEvent = false,
+                    Event = null,
+                    FailureReason =
+                        "Unsupported content type. Expected application/x-www-form-urlencoded.",
+                }
+            );
         }
 
         string formBody;
@@ -67,14 +73,16 @@ public sealed class KoFiWebhookHandler : IKoFiWebhookHandler
         }
         catch (Exception ex)
         {
-            return Task.FromResult(new WebhookHandleResult<KoFiWebhookEvent>
-            {
-                Response = WebhookResponse.Empty(400),
-                IsAuthenticated = false,
-                IsKnownEvent = false,
-                Event = null,
-                FailureReason = $"Unable to decode request body as UTF-8: {ex.Message}",
-            });
+            return Task.FromResult(
+                new WebhookHandleResult<KoFiWebhookEvent>
+                {
+                    Response = WebhookResponse.Empty(400),
+                    IsAuthenticated = false,
+                    IsKnownEvent = false,
+                    Event = null,
+                    FailureReason = $"Unable to decode request body as UTF-8: {ex.Message}",
+                }
+            );
         }
 
         Dictionary<string, string> formValues;
@@ -84,100 +92,136 @@ public sealed class KoFiWebhookHandler : IKoFiWebhookHandler
         }
         catch (Exception ex)
         {
-            return Task.FromResult(new WebhookHandleResult<KoFiWebhookEvent>
-            {
-                Response = WebhookResponse.Empty(400),
-                IsAuthenticated = false,
-                IsKnownEvent = false,
-                Event = null,
-                FailureReason = $"Malformed form body: {ex.Message}",
-            });
+            return Task.FromResult(
+                new WebhookHandleResult<KoFiWebhookEvent>
+                {
+                    Response = WebhookResponse.Empty(400),
+                    IsAuthenticated = false,
+                    IsKnownEvent = false,
+                    Event = null,
+                    FailureReason = $"Malformed form body: {ex.Message}",
+                }
+            );
         }
 
-        if (!formValues.TryGetValue(DataFieldName, out string? rawJson) || string.IsNullOrWhiteSpace(rawJson))
+        if (
+            !formValues.TryGetValue(DataFieldName, out string? rawJson)
+            || string.IsNullOrWhiteSpace(rawJson)
+        )
         {
-            return Task.FromResult(new WebhookHandleResult<KoFiWebhookEvent>
-            {
-                Response = WebhookResponse.Empty(400),
-                IsAuthenticated = false,
-                IsKnownEvent = false,
-                Event = null,
-                FailureReason = "The form body did not contain a non-empty 'data' field.",
-            });
+            return Task.FromResult(
+                new WebhookHandleResult<KoFiWebhookEvent>
+                {
+                    Response = WebhookResponse.Empty(400),
+                    IsAuthenticated = false,
+                    IsKnownEvent = false,
+                    Event = null,
+                    FailureReason = "The form body did not contain a non-empty 'data' field.",
+                }
+            );
         }
 
         KoFiPayload? payload;
         JsonDocument? rawJsonDocument;
         try
         {
-            payload = JsonSerializer.Deserialize(rawJson, KoFiJsonSerializerContext.Default.KoFiPayload);
+            payload = JsonSerializer.Deserialize(
+                rawJson,
+                KoFiJsonSerializerContext.Default.KoFiPayload
+            );
             rawJsonDocument = JsonDocument.Parse(rawJson);
         }
         catch (JsonException ex)
         {
-            return Task.FromResult(new WebhookHandleResult<KoFiWebhookEvent>
-            {
-                Response = WebhookResponse.Empty(400),
-                IsAuthenticated = false,
-                IsKnownEvent = false,
-                Event = null,
-                FailureReason = $"The 'data' field did not contain valid Ko-fi JSON: {ex.Message}",
-            });
+            return Task.FromResult(
+                new WebhookHandleResult<KoFiWebhookEvent>
+                {
+                    Response = WebhookResponse.Empty(400),
+                    IsAuthenticated = false,
+                    IsKnownEvent = false,
+                    Event = null,
+                    FailureReason =
+                        $"The 'data' field did not contain valid Ko-fi JSON: {ex.Message}",
+                }
+            );
         }
 
         if (payload is null)
         {
-            return Task.FromResult(new WebhookHandleResult<KoFiWebhookEvent>
-            {
-                Response = WebhookResponse.Empty(400),
-                IsAuthenticated = false,
-                IsKnownEvent = false,
-                Event = null,
-                FailureReason = "The Ko-fi payload could not be deserialized.",
-            });
+            return Task.FromResult(
+                new WebhookHandleResult<KoFiWebhookEvent>
+                {
+                    Response = WebhookResponse.Empty(400),
+                    IsAuthenticated = false,
+                    IsKnownEvent = false,
+                    Event = null,
+                    FailureReason = "The Ko-fi payload could not be deserialized.",
+                }
+            );
         }
 
-        if (!ConstantTimeStringComparer.Equals(payload.VerificationToken, options.VerificationToken))
+        if (
+            !ConstantTimeStringComparer.Equals(payload.VerificationToken, options.VerificationToken)
+        )
         {
             rawJsonDocument?.Dispose();
 
-            return Task.FromResult(new WebhookHandleResult<KoFiWebhookEvent>
-            {
-                Response = WebhookResponse.Empty(401),
-                IsAuthenticated = false,
-                IsKnownEvent = false,
-                Event = null,
-                FailureReason = "The Ko-fi verification token did not match the expected value.",
-            });
+            return Task.FromResult(
+                new WebhookHandleResult<KoFiWebhookEvent>
+                {
+                    Response = WebhookResponse.Empty(401),
+                    IsAuthenticated = false,
+                    IsKnownEvent = false,
+                    Event = null,
+                    FailureReason =
+                        "The Ko-fi verification token did not match the expected value.",
+                }
+            );
         }
 
-        if (!decimal.TryParse(payload.Amount, NumberStyles.Number, CultureInfo.InvariantCulture, out decimal amount))
+        if (
+            !decimal.TryParse(
+                payload.Amount,
+                NumberStyles.Number,
+                CultureInfo.InvariantCulture,
+                out decimal amount
+            )
+        )
         {
             rawJsonDocument?.Dispose();
 
-            return Task.FromResult(new WebhookHandleResult<KoFiWebhookEvent>
-            {
-                Response = WebhookResponse.Empty(400),
-                IsAuthenticated = true,
-                IsKnownEvent = false,
-                Event = null,
-                FailureReason = $"The Ko-fi amount value '{payload.Amount}' could not be parsed as a decimal.",
-            });
+            return Task.FromResult(
+                new WebhookHandleResult<KoFiWebhookEvent>
+                {
+                    Response = WebhookResponse.Empty(400),
+                    IsAuthenticated = true,
+                    IsKnownEvent = false,
+                    Event = null,
+                    FailureReason =
+                        $"The Ko-fi amount value '{payload.Amount}' could not be parsed as a decimal.",
+                }
+            );
         }
 
-        KoFiWebhookEvent normalizedEvent = MapEvent(payload, amount, rawJsonDocument?.RootElement.Clone());
+        KoFiWebhookEvent normalizedEvent = MapEvent(
+            payload,
+            amount,
+            rawJsonDocument?.RootElement.Clone()
+        );
         bool isKnownEvent = normalizedEvent is not KoFiUnknownWebhookEvent;
 
         rawJsonDocument?.Dispose();
 
-        return Task.FromResult(new WebhookHandleResult<KoFiWebhookEvent>
-        {
-            Response = WebhookResponse.Empty(200),
-            IsAuthenticated = true,
-            IsKnownEvent = isKnownEvent,
-            Event = normalizedEvent,
-            FailureReason = null,
-        });
+        return Task.FromResult(
+            new WebhookHandleResult<KoFiWebhookEvent>
+            {
+                Response = WebhookResponse.Empty(200),
+                IsAuthenticated = true,
+                IsKnownEvent = isKnownEvent,
+                Event = normalizedEvent,
+                FailureReason = null,
+            }
+        );
     }
 
     private static Dictionary<string, string> ParseFormUrlEncoded(string formBody)
@@ -244,15 +288,22 @@ public sealed class KoFiWebhookHandler : IKoFiWebhookHandler
         return Uri.UnescapeDataString(plusNormalized);
     }
 
-    private static KoFiWebhookEvent MapEvent(KoFiPayload payload, decimal amount, JsonElement? rawPayload)
+    private static KoFiWebhookEvent MapEvent(
+        KoFiPayload payload,
+        decimal amount,
+        JsonElement? rawPayload
+    )
     {
         return payload.Type switch
         {
             "Donation" => CreateDonationEvent(payload, amount),
-            "Subscription" when payload.IsSubscriptionPayment && payload.IsFirstSubscriptionPayment =>
+            "Subscription"
+                when payload.IsSubscriptionPayment && payload.IsFirstSubscriptionPayment =>
                 CreateSubscriptionStartedEvent(payload, amount),
-            "Subscription" when payload.IsSubscriptionPayment =>
-                CreateSubscriptionRenewedEvent(payload, amount),
+            "Subscription" when payload.IsSubscriptionPayment => CreateSubscriptionRenewedEvent(
+                payload,
+                amount
+            ),
             "Shop Order" => CreateShopOrderEvent(payload, amount),
             "Commission" => CreateCommissionEvent(payload, amount),
             "Referral" => CreateReferralEvent(payload, amount),
@@ -280,7 +331,10 @@ public sealed class KoFiWebhookHandler : IKoFiWebhookHandler
         };
     }
 
-    private static KoFiSubscriptionStartedEvent CreateSubscriptionStartedEvent(KoFiPayload payload, decimal amount)
+    private static KoFiSubscriptionStartedEvent CreateSubscriptionStartedEvent(
+        KoFiPayload payload,
+        decimal amount
+    )
     {
         return new()
         {
@@ -300,7 +354,10 @@ public sealed class KoFiWebhookHandler : IKoFiWebhookHandler
         };
     }
 
-    private static KoFiSubscriptionRenewedEvent CreateSubscriptionRenewedEvent(KoFiPayload payload, decimal amount)
+    private static KoFiSubscriptionRenewedEvent CreateSubscriptionRenewedEvent(
+        KoFiPayload payload,
+        decimal amount
+    )
     {
         return new()
         {
@@ -382,7 +439,11 @@ public sealed class KoFiWebhookHandler : IKoFiWebhookHandler
         };
     }
 
-    private static KoFiUnknownWebhookEvent CreateUnknownEvent(KoFiPayload payload, decimal amount, JsonElement rawPayload)
+    private static KoFiUnknownWebhookEvent CreateUnknownEvent(
+        KoFiPayload payload,
+        decimal amount,
+        JsonElement rawPayload
+    )
     {
         return new()
         {

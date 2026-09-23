@@ -47,6 +47,11 @@ jobs:
     - name: Restore dependencies
       run: dotnet restore KoFi.Client.slnx
 
+    - name: Check formatting
+      run: |
+        dotnet tool restore
+        dotnet csharpier check .
+
     - name: Build solution
       run: dotnet build KoFi.Client.slnx --configuration Release --no-restore
 

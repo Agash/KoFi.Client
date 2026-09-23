@@ -22,7 +22,8 @@ public static class HttpContextWebhookRequestMapper
     /// </returns>
     public static async Task<WebhookRequest> FromHttpContextAsync(
         HttpContext context,
-        CancellationToken cancellationToken = default)
+        CancellationToken cancellationToken = default
+    )
     {
         ArgumentNullException.ThrowIfNull(context);
 
@@ -55,7 +56,9 @@ public static class HttpContextWebhookRequestMapper
         {
             Method = context.Request.Method,
             Path = context.Request.Path.HasValue ? context.Request.Path.Value : "/",
-            QueryString = context.Request.QueryString.HasValue ? context.Request.QueryString.Value : null,
+            QueryString = context.Request.QueryString.HasValue
+                ? context.Request.QueryString.Value
+                : null,
             ContentType = context.Request.ContentType,
             Headers = headers,
             Body = body,
