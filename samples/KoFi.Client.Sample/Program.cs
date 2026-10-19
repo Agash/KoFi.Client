@@ -1,4 +1,6 @@
 using System.Collections.Concurrent;
+using System.Diagnostics;
+using System.Globalization;
 using DevTunnels.Client;
 using DevTunnels.Client.Authentication;
 using DevTunnels.Client.Hosting;
@@ -101,12 +103,14 @@ internal static class SampleApplication
                     string status = $"[blue]{result.Response.StatusCode}[/]";
 
                     AnsiConsole.MarkupLineInterpolated(
+                        CultureInfo.CurrentCulture,
                         $"[grey]Request[/] [white]{Markup.Escape(requestId)}[/] from [white]{Markup.Escape(remoteIp)}[/] -> status {status}, authenticated {auth}, known event {known}."
                     );
 
                     if (!string.IsNullOrWhiteSpace(result.FailureReason))
                     {
                         AnsiConsole.MarkupLineInterpolated(
+                            CultureInfo.CurrentCulture,
                             $"[yellow]Reason:[/] {Markup.Escape(result.FailureReason)}"
                         );
                     }
@@ -250,10 +254,12 @@ internal static class SampleApplication
         }
 
         AnsiConsole.MarkupLineInterpolated(
+            CultureInfo.CurrentCulture,
             $"[green]CLI found:[/] devtunnel [white]{Markup.Escape(probe.Version?.ToString() ?? "unknown")}[/]"
         );
 
         AnsiConsole.MarkupLineInterpolated(
+            CultureInfo.CurrentCulture,
             $"[grey]Ensuring login with[/] [white]{Markup.Escape(configuration.LoginProvider.ToString())}[/][grey]...[/]"
         );
 
@@ -300,6 +306,7 @@ internal static class SampleApplication
             );
 
         AnsiConsole.MarkupLineInterpolated(
+            CultureInfo.CurrentCulture,
             $"[green]Tunnel ready:[/] [link]{Markup.Escape(publicBaseUrl.ToString())}[/]"
         );
 
@@ -478,7 +485,7 @@ internal static class SampleApplication
                             _ = table.AddRow(
                                 Markup.Escape(GetEventDisplayName(evt)),
                                 Markup.Escape(evt.FromName ?? "(anonymous)"),
-                                evt.Amount.ToString("0.00"),
+                                evt.Amount.ToString("0.00", CultureInfo.CurrentCulture),
                                 Markup.Escape(evt.Currency),
                                 Markup.Escape(evt.Timestamp.ToString("u"))
                             );
@@ -504,6 +511,9 @@ internal static class SampleApplication
 
                 case "Exit":
                     return;
+
+                default:
+                    throw new UnreachableException($"The menu has no '{command}'.");
             }
 
             await Task.Yield();
