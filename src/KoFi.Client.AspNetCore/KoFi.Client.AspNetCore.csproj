@@ -23,7 +23,14 @@
 
   <ItemGroup>
     <ProjectReference Include="..\KoFi.Client\KoFi.Client.csproj" />
-    <PackageReference Include="Agash.Webhook.Abstractions" />
+    <ProjectReference
+      Include="$(WebhookAbstractionsProject)"
+      Condition="'$(UseLocalWebhookAbstractions)' == 'true'"
+    />
+    <PackageReference
+      Include="Agash.Webhook.Abstractions"
+      Condition="'$(UseLocalWebhookAbstractions)' != 'true'"
+    />
   </ItemGroup>
 
   <ItemGroup>
